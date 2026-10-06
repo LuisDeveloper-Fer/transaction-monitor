@@ -73,8 +73,8 @@ La base de datos conserva eventos; Prometheus conserva series temporales. Las m√
 
 ```bash
 curl -i -X POST http://localhost:8080/api/transactions \
-+  -H 'Content-Type: application/json' \
-+  --data '{"id":"10000000-0000-4000-8000-000000000001","service":"PAYMENTS","status":"SUCCESS","durationMs":250,"occurredAt":"2026-01-01T00:00:00Z"}'
+  -H 'Content-Type: application/json' \
+  --data '{"id":"10000000-0000-4000-8000-000000000001","service":"PAYMENTS","status":"SUCCESS","durationMs":250,"occurredAt":"2026-01-01T00:00:00Z"}'
 ```
 
 Ejemplo de respuesta, campos relevantes:
