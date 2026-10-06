@@ -1,0 +1,43 @@
+name: transaction-monitor
+services:
+  api:
+    build: .
+    ports: ["127.0.0.1:${API_PORT:-8080}:8080"]
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/lab
+      DB_USER: lab
+      DB_PASSWORD: local-db-only
+    depends_on:
+      db:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    ports: ["127.0.0.1:${UI_PORT:-4200}:8080"]
+    depends_on: [api]
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: lab
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: local-db-only
+    volumes: ["database:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d lab"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    ports: ["127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"]
+    volumes: ["./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+  grafana:
+    image: grafana/grafana:12.1.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: local-demo-only
+    ports: ["127.0.0.1:${GRAFANA_PORT:-3000}:3000"]
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+volumes:
+  database:
